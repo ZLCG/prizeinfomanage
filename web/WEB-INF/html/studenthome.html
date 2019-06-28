@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns="http://www.w3.org/1999/html">
+<head>
+    <meta charset="UTF-8">
+    <title>学生奖惩信息管理系统</title>
+    <link rel="shortcut icon" href="static/img/favicon.ico" type="image/x-icon" />
+    <link rel="stylesheet" href="static/css/bootstrap.min.css" type="text/css"/>
+    <link rel="stylesheet" href="static/css/stumanage.css" type="text/css">
+</head>
+<body background="static/img/furley_bg.png" >
+
+<nav class="navbar navbar-default" id="nav">
+    <h3 class="navbar-text"><em><strong>湖南人文科技学院</strong></em>&nbsp;&nbsp;&nbsp;学生奖惩信息管理系统</h3>
+    <h4 class="navbar-text pull-right"><strong>欢迎您，{{username}}！&nbsp;<button class="btn btn-default"  @click="confirmSelect">退出系统</button></strong></h4>
+
+    <!-- 确认选择模态框 -->
+    <div class="modal fade" id="confirmSelectModal" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title">确认退出登录？</h4>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" @click="studentLoginOut">确认</button>
+                    <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</nav>
+
+<div id="list">
+    <!--二级菜单-->
+    <nav class="navbar navbar-default">&nbsp;&nbsp;&nbsp;
+        <a href="viewprizeinfo.action"><button type="button" class="btn btn-default navbar-btn">奖惩列表</button></a>&nbsp;&nbsp;&nbsp;
+        <a href="studentPasswordManage.action"><button type="button" class="btn btn-default navbar-btn">密码管理</button></a>&nbsp;&nbsp;&nbsp;
+        <a href="studentHome.action"><button type="button" class="btn btn-default navbar-btn">回到主页</button></a>
+    </nav>
+
+</div>
+<script type="text/javascript" src="static/js/jquery.min.js"></script>
+<script type="text/javascript" src="static/js/bootstrap.min.js"></script>
+<script type="text/javascript" src="static/js/vue.min.js"></script>
+<script type="text/javascript">
+    new Vue({
+        el: '#nav',
+        data: {
+            username: '用户'
+        },
+        created() {
+            this.getUserName();
+        },
+        methods: {
+            //获取用户名显示到页面上，如果没有登录则跳转到登录界面
+            getUserName() {
+                var that = this;
+                $.post("userName.action",{usersort: "学生"}, function (data) {
+                    if (Object.keys(data).length == 0){
+                        window.location.href = 'studentLoginOut.action';
+                        return false;
+                    }
+                    that.username = data;
+                });
+            },
+
+            //弹出确认模态框
+            confirmSelect(){
+                $("#confirmSelectModal").modal();
+            },
+            //退出登录
+            studentLoginOut() {
+                window.location.href = 'studentLoginOut.action';
+            }
+        }
+    });
+
+</script>
+</body>
+</html>

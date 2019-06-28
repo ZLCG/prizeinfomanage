@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>欢迎使用学生奖惩信息管理系统！请登录</title>
+    <link rel="shortcut icon" href="static/img/favicon.ico" type="image/x-icon" />
+    <link rel="stylesheet" href="static/css/bootstrap.min.css" type="text/css"/>
+    <link rel="stylesheet" href="static/css/stumanage.css" type="text/css">
+</head>
+<body background="static/img/furley_bg.png" >
+
+<nav class="navbar navbar-default">
+    <h3 class="navbar-text"><em><strong>湖南人文科技学院</strong></em>&nbsp;&nbsp;&nbsp;学生奖惩信息管理系统</h3>
+</nav>
+
+<br><br><br><br><br><br><br><br>
+
+<form id="loginForm">
+    <div class="form-group">
+        <div class="input-group">
+            <label class="input-group-addon" for="username">
+                <span class="glyphicon glyphicon-user"></span>&nbsp;账&nbsp;号
+            </label>
+            <input type="text" class="form-control input-lg" id="username" placeholder="请输入账号...">
+        </div>
+    </div>
+    <br>
+    <div class="form-group">
+        <div class="input-group">
+            <label class="input-group-addon" for="password">
+                <span class="glyphicon glyphicon-lock"></span>&nbsp;密&nbsp;码
+            </label>
+            <input type="password" class="form-control input-lg" id="password" placeholder="请输入密码...">
+        </div>
+    </div>
+    <br>
+    <div class="form-group">
+        <div class="input-group">
+            <label class="input-group-addon" for="identity">
+                <span class="glyphicon glyphicon-th-list"></span>&nbsp;身&nbsp;份
+            </label>
+            <select class="form-control input-lg" id="identity">
+                <option>学生</option>
+                <option>教师</option>
+            </select>
+        </div>
+    </div>
+    <br>
+    <button type="button" class="btn btn-info btn-lg btn-block" @click="checkLoginForm">登&nbsp;&nbsp;&nbsp;&nbsp;录</button>
+
+    <!-- 模态框（Modal） -->
+    <div class="modal fade" id="checkLoginForm" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <h4 class="modal-body">{{falseMessage}}</h4>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</form>
+
+
+
+<script type="text/javascript" src="static/js/jquery.min.js"></script>
+<script type="text/javascript" src="static/js/bootstrap.min.js"></script>
+<script type="text/javascript" src="static/js/vue.min.js"></script>
+<script type="text/javascript">
+    const vm = new Vue({
+        el: '#loginForm',
+        data: {
+            falseMessage: ''    //验证码输入错误，请重试！
+        },
+        methods: {
+            checkLoginForm() {
+                if ($("#username").val() == ""){
+                    this.falseMessage = '账号不能为空！';
+                    $("#checkLoginForm").modal();
+                    return false;
+                }
+                if ($("#password").val() == ""){
+                    this.falseMessage = '密码不能为空！';
+                    $("#checkLoginForm").modal();
+                    return false;
+                }
+
+                var that = this;
+                $.ajax({
+                    url: "userLogin.action",
+                    type: "POST",
+                    data: {"username":$("#username").val(), "password":$("#password").val(), "identity":$("#identity").val()},
+                    success: function (data) {
+                        if(data.ok){
+                            window.location.href = data.message;
+                        }else{
+                            that.falseMessage = data.message;
+                            $("#checkLoginForm").modal();
+                        }
+                        return false;
+                    },
+                    error: function () {
+                        that.falseMessage = '系统错误，请稍后重试！';
+                        $("#checkLoginForm").modal();
+                    },
+                    dataType:"json"
+                });
+            }
+        }
+    })
+</script>
+</body>
+</html>

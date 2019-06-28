@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns="http://www.w3.org/1999/html">
+<head>
+    <meta charset="UTF-8">
+    <title>修改学生信息</title>
+    <link rel="shortcut icon" href="static/img/favicon.ico" type="image/x-icon" />
+    <link rel="stylesheet" href="static/css/bootstrap.min.css" type="text/css"/>
+    <link rel="stylesheet" href="static/css/stumanage.css" type="text/css">
+</head>
+<body background="static/img/furley_bg.png" >
+
+<nav class="navbar navbar-default" id="nav">
+    <h3 class="navbar-text"><em><strong>湖南人文科技学院</strong></em>&nbsp;&nbsp;&nbsp;学生奖惩信息管理系统</h3>
+    <h4 class="navbar-text pull-right"><strong>欢迎您，{{username}}老师！&nbsp;<button class="btn btn-default" @click="confirmSelect">退出系统</button></strong></h4>
+
+    <!-- 确认选择模态框 -->
+    <div class="modal fade" id="confirmSelectModal" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title">确认退出登录？</h4>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" @click="teacherLoginOut">确认</button>
+                    <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</nav>
+
+<div id="list">
+    <!--二级菜单-->
+    <nav class="navbar navbar-default">&nbsp;&nbsp;&nbsp;
+        <a href="viewstudent.action"><button type="button" class="btn btn-default navbar-btn">学生列表</button></a>&nbsp;&nbsp;&nbsp;
+        <a href="teacherHome.action"><button type="button" class="btn btn-default navbar-btn">回到主页</button></a>
+    </nav>
+
+    <!--修改学生信息-->
+    <div class="container-fluid">
+        <form class="centerform"><br><br>
+            <div class="form-group">
+                <label for="number">学号</label>
+                <input type="text" class="form-control" id="number" :value="number">
+            </div>
+
+            <div class="form-group">
+                <label for="password">密码</label>
+                <input type="password" class="form-control" id="password" :value="password">
+            </div>
+
+            <div class="form-group">
+                <label for="name">姓名</label>
+                <input type="text" class="form-control" id="name" :value="name">
+            </div>
+
+            <div class="form-group">
+                <label for="sex">性别</label>
+                <select class="form-control" id="sex" :value="sex">
+                    <option>男</option>
+                    <option>女</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="classname">班级</label>
+                <select class="form-control" id="classname" :value="classname">
+                    <option>物联B20161</option>
+                    <option>软工B20161</option>
+                    <option>能机B20151</option>
+                    <option>英语B20151</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="grade">年级</label>
+                <select class="form-control" id="grade" :value="grade">
+                    <option>14</option>
+                    <option>15</option>
+                    <option>16</option>
+                    <option>17</option>
+                    <option>18</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="college">学院</label>
+                <select class="form-control" id="college" :value="college">
+                    <option>信息学院</option>
+                    <option>能源与机电工程学院</option>
+                    <option>外国语学院</option>
+                </select>
+            </div>
+
+            <button type="button" class="btn btn-info btn-block" @click="confirmAdd">修改</button>
+        </form>
+    </div>
+
+
+
+    <!-- 确认添加模态框 -->
+    <div class="modal fade" id="confirmAddModal" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title">确认修改学生信息？</h4>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" @click="addStudent">确认</button>
+                    <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 模态框（Modal） -->
+    <div class="modal fade" id="remindMessage" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <h4 class="modal-body">{{remindMessage}}</h4>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+<script type="text/javascript" src="static/js/jquery.min.js"></script>
+<script type="text/javascript" src="static/js/bootstrap.min.js"></script>
+<script type="text/javascript" src="static/js/vue.min.js"></script>
+<script type="text/javascript">
+    new Vue({
+        el: '#nav',
+        data: {
+            username: '用户'
+        },
+        created() {
+            this.getUserName();
+        },
+        methods: {
+            //获取用户名显示到页面上，如果没有登录则跳转到登录界面
+            getUserName() {
+                var that = this;
+                $.post("userName.action",{usersort: "教师"}, function (data) {
+                    if (Object.keys(data).length == 0){
+                        window.location.href = 'teacherLoginOut.action';
+                        return false;
+                    }
+                    that.username = data;
+                });
+            },
+
+            //弹出确认模态框
+            confirmSelect(){
+                $("#confirmSelectModal").modal();
+            },
+            //退出登录
+            teacherLoginOut() {
+                window.location.href = 'teacherLoginOut.action';
+            }
+        }
+    });
+
+    new Vue({
+        el: '#list',
+        data: {
+            remindMessage: '',
+            number: '',
+            password: '',
+            name: '',
+            sex: '',
+            classname: '',
+            grade: '',
+            college: ''
+        },
+        created() {
+            this.updateStudentMessage();
+        },
+        methods: {
+            //在页面上展示学生原来的信息
+            updateStudentMessage(){
+                var that = this;
+                $.post("updateStudentMessage.action", function (data) {
+                    that.number = data.number;
+                    that.password = data.password;
+                    that.name = data.name;
+                    that.sex = data.sex;
+                    that.classname = data.classname;
+                    that.grade = data.grade;
+                    that.college = data.college;
+                });
+            },
+
+            //弹出确认修改模态框
+            confirmAdd(){
+                $("#confirmAddModal").modal();
+            },
+
+            //修改学生信息
+            addStudent(){
+                var that = this;
+                $.ajax({
+                    url: "updateStudent.action",
+                    type: "POST",
+                    data: {
+                        "number":$("#number").val(),
+                        "password":$("#password").val(),
+                        "name":$("#name").val(),
+                        "sex":$("#sex").val(),
+                        "classname":$("#classname").val(),
+                        "grade":$("#grade").val(),
+                        "college":$("#college").val()
+                    },
+                    success: function (data) {
+                        $("#confirmAddModal").modal('hide');
+                        that.updateStudentMessage();
+                        that.remindMessage = '修改成功';
+                        $("#remindMessage").modal();
+                    },
+                    error: function () {
+                        $("#confirmAddModal").modal('hide');
+                        that.remindMessage = '修改失败，请稍后重试！';
+                        $("#remindMessage").modal();
+                    },
+                    dataType:"json"
+                });
+            }
+        }
+    });
+
+
+</script>
+</body>
+</html>

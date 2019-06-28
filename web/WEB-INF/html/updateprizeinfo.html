@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns="http://www.w3.org/1999/html">
+<head>
+    <meta charset="UTF-8">
+    <title>修改奖惩信息</title>
+    <link rel="shortcut icon" href="static/img/favicon.ico" type="image/x-icon" />
+    <link rel="stylesheet" href="static/css/bootstrap.min.css" type="text/css"/>
+    <link rel="stylesheet" href="static/css/stumanage.css" type="text/css">
+</head>
+<body background="static/img/furley_bg.png" >
+
+<nav class="navbar navbar-default" id="nav">
+    <h3 class="navbar-text"><em><strong>湖南人文科技学院</strong></em>&nbsp;&nbsp;&nbsp;学生奖惩信息管理系统</h3>
+    <h4 class="navbar-text pull-right"><strong>欢迎您，{{username}}老师！&nbsp;<button class="btn btn-default" @click="confirmSelect">退出系统</button></strong></h4>
+
+    <!-- 确认选择模态框 -->
+    <div class="modal fade" id="confirmSelectModal" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title">确认退出登录？</h4>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" @click="teacherLoginOut">确认</button>
+                    <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</nav>
+
+<div id="list">
+    <!--二级菜单-->
+    <nav class="navbar navbar-default">&nbsp;&nbsp;&nbsp;
+        <a href="prizeinfoManage.action"><button type="button" class="btn btn-default navbar-btn">奖惩信息管理</button></a>&nbsp;&nbsp;&nbsp;
+        <button type="button" class="btn btn-primary navbar-btn">修改奖惩信息</button>&nbsp;&nbsp;
+        <a href="teacherHome.action"><button type="button" class="btn btn-default navbar-btn">回到主页</button></a>
+    </nav>
+
+    <!--添加奖惩条目-->
+    <div class="container-fluid">
+        <form class="centerform"><br><br>
+
+            <div class="form-group">
+                <label for="sort">请选择类别</label>
+                <select class="form-control" id="sort" :value="sort">
+                    <option>奖励</option>
+                    <option>处分</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="name">请输入名称</label>
+                <input type="text" class="form-control" id="name" :value="name">
+            </div>
+
+            <div class="form-group">
+                <label for="measure">请输入内容</label>
+                <input type="text" class="form-control" id="measure" :value="measure">
+            </div>
+
+
+            <div class="form-group">
+                <label for="reason">请输入原因</label>
+                <input type="text" class="form-control" id="reason" :value="reason">
+            </div>
+
+
+            <button type="button" class="btn btn-info btn-block" @click="confirmAdd">修改</button>
+        </form>
+    </div>
+
+
+
+    <!-- 确认添加模态框 -->
+    <div class="modal fade" id="confirmAddModal" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title">确认修改奖惩信息？</h4>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" @click="updatePrizeinfo">确认</button>
+                    <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 模态框（Modal） -->
+    <div class="modal fade" id="remindMessage" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <h4 class="modal-body">{{remindMessage}}</h4>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+<script type="text/javascript" src="static/js/jquery.min.js"></script>
+<script type="text/javascript" src="static/js/bootstrap.min.js"></script>
+<script type="text/javascript" src="static/js/vue.min.js"></script>
+<script type="text/javascript">
+    new Vue({
+        el: '#nav',
+        data: {
+            username: '用户'
+        },
+        created() {
+            this.getUserName();
+        },
+        methods: {
+            //获取用户名显示到页面上，如果没有登录则跳转到登录界面
+            getUserName() {
+                var that = this;
+                $.post("userName.action",{usersort: "教师"}, function (data) {
+                    if (Object.keys(data).length == 0){
+                        window.location.href = 'teacherLoginOut.action';
+                        return false;
+                    }
+                    that.username = data;
+                });
+            },
+
+            //弹出确认模态框
+            confirmSelect(){
+                $("#confirmSelectModal").modal();
+            },
+            //退出登录
+            teacherLoginOut() {
+                window.location.href = 'teacherLoginOut.action';
+            }
+        }
+    });
+
+    new Vue({
+        el: '#list',
+        data: {
+            remindMessage: '',
+            sort: '',
+            name: '',
+            measure: '',
+            reason: '',
+        },
+        created() {
+            this.updatePrizeinfoMessage();
+        },
+        methods: {
+            //在页面上展示学生原来的信息
+            updatePrizeinfoMessage(){
+                var that = this;
+                $.post("updatePrizeinfoMessage.action", function (data) {
+                    that.sort = data.sort;
+                    that.name = data.name;
+                    that.measure = data.measure;
+                    that.reason = data.reason;
+                });
+            },
+
+            //弹出确认修改模态框
+            confirmAdd(){
+                $("#confirmAddModal").modal();
+            },
+
+            //修改奖惩信息
+            updatePrizeinfo(){
+                var that = this;
+                $.ajax({
+                    url: "updatePrizeinfo.action",
+                    type: "POST",
+                    data: {
+                        "sort":$("#sort").val(),
+                        "name":$("#name").val(),
+                        "measure":$("#measure").val(),
+                        "reason":$("#reason").val()
+                    },
+                    success: function (data) {
+                        $("#confirmAddModal").modal('hide');
+                        that.updatePrizeinfoMessage();
+                        that.remindMessage = '修改成功';
+                        $("#remindMessage").modal();
+                    },
+                    error: function () {
+                        $("#confirmAddModal").modal('hide');
+                        that.remindMessage = '修改失败，请稍后重试！';
+                        $("#remindMessage").modal();
+                    },
+                    dataType:"json"
+                });
+            }
+        }
+    });
+
+
+</script>
+</body>
+</html>

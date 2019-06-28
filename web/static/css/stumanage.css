@@ -1,0 +1,17 @@
+body{
+    min-width: 1366px;
+}
+#loginForm{
+    margin: 0px 39% 0px 39%;
+    min-width: 390px;
+}
+/*
+<style>
+    .container {width: 1200px;}
+    .container-fluid{width: 1920px;}
+</style>
+*/
+.centerform{
+    margin: 0px 39% 0px 39%;
+    min-width: 390px;
+}
